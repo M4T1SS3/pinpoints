@@ -4,6 +4,7 @@
   "description": "Pick UI elements and inject structured context directly into your AI chat",
   "version": "0.1.0",
   "publisher": "pinpoint",
+  "license": "SEE LICENSE IN LICENSE",
   "repository": {
     "type": "git",
     "url": "https://github.com/M4T1SS3/pinpoint.git"
