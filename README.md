@@ -1,6 +1,8 @@
-# PinPoint - VS Code Extension
+# PinPoint — The missing link between your UI and your AI
 
-**Pick UI elements and inject structured context directly into your AI coding agent** - without full-screen screenshots.
+<p align="center">![PinPoint — UI Lens](resources/icon.png)</p>
+
+**Pick UI elements and inject structured context directly into your AI coding agent** — without full-page screenshots.
 
 ## Overview
 
