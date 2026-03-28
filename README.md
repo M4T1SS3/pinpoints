@@ -29,7 +29,7 @@ https://marketplace.visualstudio.com/items?itemName=pinpointpoint.pinpoint
 Install the CLI globally:
 
 ```bash
-npm install -g pinpoint
+npm install -g pinpoints
 ```
 
 Then run:
