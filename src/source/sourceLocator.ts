@@ -1,11 +1,10 @@
 import * as puppeteer from 'puppeteer-core';
 import { Identity, DomContext, SourceLocation } from '../schemas';
 import { SourceMapResolver } from './sourceMapResolver';
-import { WorkspaceGrep } from './workspaceGrep';
+import { WorkspaceGrep, NodeWorkspaceFileProvider } from './workspaceGrep';
 
 export class SourceLocator {
   private sourceMapResolver = new SourceMapResolver();
-  private workspaceGrep = new WorkspaceGrep();
 
   async locate(
     page: puppeteer.Page,
@@ -13,8 +12,10 @@ export class SourceLocator {
     dom: DomContext,
     workspaceRoot: string
   ): Promise<SourceLocation | undefined> {
+    const workspaceGrep = new WorkspaceGrep(new NodeWorkspaceFileProvider(workspaceRoot));
+
     // Build signals from identity/dom for both strategies
-    const signals = this.workspaceGrep.buildSignals(identity, dom);
+    const signals = workspaceGrep.buildSignals(identity, dom);
 
     if (signals.length === 0) return undefined;
 
@@ -30,7 +31,7 @@ export class SourceLocator {
 
     // Strategy 2: Workspace grep (fallback)
     try {
-      return await this.workspaceGrep.search(identity, dom);
+      return await workspaceGrep.search(identity, dom);
     } catch (error) {
       console.warn('Workspace grep failed:', error);
       return undefined;

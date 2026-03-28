@@ -16,6 +16,28 @@ Avoids noisy screenshots by providing structured, DOM-aware UI context that redu
 
 Extracts stable selectors, cleaned element+parent HTML, layout bbox, and computed style diffs, optionally captures an element screenshot, and formats everything as AI-friendly Markdown.
 
+## Installation
+
+### 1) VS Code extension
+
+Install PinPoint from the VS Code Marketplace:
+
+https://marketplace.visualstudio.com/items?itemName=pinpointpoint.pinpoint
+
+### 2) Global CLI installation
+
+Install the CLI globally:
+
+```bash
+npm install -g pinpoint
+```
+
+Then run:
+
+```bash
+pinpoint start
+```
+
 
 
 ## Usage
@@ -29,15 +51,7 @@ Extracts stable selectors, cleaned element+parent HTML, layout bbox, and compute
 5. **Add your instruction**: Type "Make this button look like..." and send
 
 
-### Commands
 
-- `PinPoint: Start Picker` - Launch browser + inspect mode
-- `PinPoint: Stop Picker` - Cancel and close browser
-- `PinPoint: Toggle Screenshot` - Enable/disable element screenshots
-- `PinPoint: Set Mode` - Choose Quick Fix / Layout / CSS / Visual
-- `PinPoint: Clear Selection` - Clear multi-select queue
-
----
 
 ## Capture Modes
 

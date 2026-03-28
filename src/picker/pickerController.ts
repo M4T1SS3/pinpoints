@@ -12,6 +12,7 @@ import { Redactor } from '../extraction/redactor';
 import { ContextFormatter } from '../export/contextFormatter';
 import { SourceLocator } from '../source/sourceLocator';
 import { MaxContext, CaptureMode, Identity } from '../schemas';
+import { injectPickerToolbar } from '../core/pickerToolbar';
 
 export class PickerController {
   private browserSession: BrowserSessionManager | null = null;
@@ -83,18 +84,26 @@ export class PickerController {
         const logoSvgContent = fs.readFileSync(logoSvgPath, 'utf-8');
 
         // Inject picker UI and handlers
-        await this.injectPickerUI(page, logoSvgContent);
+        await this.injectPickerUI(page, logoSvgContent, this.currentMode, this.injectionTarget);
 
         // Re-inject on navigation/refresh to make persistent
-        page.on('domcontentloaded', async () => {
+        const attemptReinject = async () => {
           if (this.isPickerActive) {
             try {
               // Wait for body to be available just in case
-              await page.waitForSelector('body', { timeout: 1000 }).catch(() => {});
-              await this.injectPickerUI(page, logoSvgContent);
+              await page.waitForSelector('body', { timeout: 2000 }).catch(() => {});
+              await this.injectPickerUI(page, logoSvgContent, this.currentMode, this.injectionTarget);
             } catch (e) {
               console.error('Failed to reinject picker UI:', e);
             }
+          }
+        };
+
+        page.on('domcontentloaded', attemptReinject);
+        page.on('load', attemptReinject);
+        page.on('framenavigated', (frame: any) => {
+          if (frame === page.mainFrame()) {
+            attemptReinject();
           }
         });
 
@@ -113,8 +122,12 @@ export class PickerController {
     }
   }
 
-  private async injectPickerUI(page: any, logoSvg: string) {
-    await page.evaluate((logoSvg: string) => {
+  private async injectPickerUI(page: any, logoSvg: string, initialMode: string, initialTarget: string) {
+    await injectPickerToolbar(page, { logoSvg, initialMode, initialTarget });
+    return;
+
+    await page.evaluate((args: { logoSvg: string, initialMode: string, initialTarget: string }) => {
+      const { logoSvg, initialMode, initialTarget } = args;
       if (document.getElementById('pinpoint-module')) return;
       const btnBase = `
         height: 36px;
@@ -244,7 +257,7 @@ export class PickerController {
               width: 36px;
               transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             "></div>
-            <button data-mode="pick" title="Quick Fix" style="${btnBase} color: #ffffff;">
+            <button data-mode="pick" title="Quick Fix" style="${btnBase}">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
                 <circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/><circle cx="5" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>
               </svg>
@@ -279,7 +292,7 @@ export class PickerController {
               width: 36px;
               transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             "></div>
-            <button data-target="claude-code" title="Claude Code" style="${btnBase} color: #ffffff;">
+            <button data-target="claude-code" title="Claude Code" style="${btnBase}">
               <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" style="flex-shrink:0;">
                 <path d="m3.127 10.604 3.135-1.76.053-.153-.053-.085H6.11l-.525-.032-1.791-.048-1.554-.065-1.505-.08-.38-.081L0 7.832l.036-.234.32-.214.455.04 1.009.069 1.513.105 1.097.064 1.626.17h.259l.036-.105-.089-.065-.068-.064-1.566-1.062-1.695-1.121-.887-.646-.48-.327-.243-.306-.104-.67.435-.48.585.04.15.04.593.456 1.267.981 1.654 1.218.242.202.097-.068.012-.049-.109-.181-.9-1.626-.96-1.655-.428-.686-.113-.411a2 2 0 0 1-.068-.484l.496-.674L4.446 0l.662.089.279.242.411.94.666 1.48 1.033 2.014.302.597.162.553.06.17h.105v-.097l.085-1.134.157-1.392.154-1.792.052-.504.25-.605.497-.327.387.186.319.456-.045.294-.19 1.23-.37 1.93-.243 1.29h.142l.161-.16.654-.868 1.097-1.372.484-.545.565-.601.363-.287h.686l.505.751-.226.775-.707.895-.585.759-.839 1.13-.524.904.048.072.125-.012 1.897-.403 1.024-.186 1.223-.21.553.258.06.263-.218.536-1.307.323-1.533.307-2.284.54-.028.02.032.04 1.029.098.44.024h1.077l2.005.15.525.346.315.424-.053.323-.807.411-3.631-.863-.872-.218h-.12v.073l.726.71 1.331 1.202 1.667 1.55.084.383-.214.302-.226-.032-1.464-1.101-.565-.497-1.28-1.077h-.084v.113l.295.432 1.557 2.34.08.718-.112.234-.404.141-.444-.08-.911-1.28-.94-1.44-.759-1.291-.093.053-.448 4.821-.21.246-.484.186-.403-.307-.214-.496.214-.98.258-1.28.21-1.016.19-1.263.112-.42-.008-.028-.092.012-.953 1.307-1.448 1.957-1.146 1.227-.274.109-.477-.247.045-.44.266-.39 1.586-2.018.956-1.25.617-.723-.004-.105h-.036l-4.212 2.736-.75.096-.324-.302.04-.496.154-.162 1.267-.871z"/>
               </svg>
@@ -475,11 +488,11 @@ export class PickerController {
       });
 
       // Mode buttons
-      (window as any).pinPointMode = 'pick';
+      (window as any).pinPointMode = initialMode || 'pick';
       const modeButtons = modes.querySelectorAll('button');
-      let activeModeBtn = modeButtons[0] as HTMLElement;
+      let activeModeBtn = Array.from(modeButtons).find(btn => btn.getAttribute('data-mode') === (window as any).pinPointMode) as HTMLElement || modeButtons[0] as HTMLElement;
 
-      // Initialize first mode button as active
+      // Initialize active mode button
       activeModeBtn.style.color = '#ffffff';
       updateSlider(modeSlider, activeModeBtn);
 
@@ -514,9 +527,9 @@ export class PickerController {
 
       // Target buttons
       const targetButtons = targets.querySelectorAll('button');
-      let activeTargetBtn = targetButtons[0] as HTMLElement;
+      let activeTargetBtn = Array.from(targetButtons).find(btn => btn.getAttribute('data-target') === initialTarget) as HTMLElement || targetButtons[0] as HTMLElement;
 
-      // Initialize first target button as active
+      // Initialize active target button
       activeTargetBtn.style.color = '#ffffff';
       updateSlider(targetSlider, activeTargetBtn);
 
@@ -590,7 +603,7 @@ export class PickerController {
           id: el.id,
         }));
       }, true);
-    }, logoSvg);
+    }, { logoSvg, initialMode, initialTarget });
   }
 
   private async promptForUrl(): Promise<string | undefined> {
@@ -745,6 +758,12 @@ export class PickerController {
           this.captureClickedElement(page);
         } catch (e) {
           // Fail silently
+        }
+      } else if (text.startsWith('PINPOINT_MODE_CHANGED:')) {
+        const mode = text.replace('PINPOINT_MODE_CHANGED:', '').trim();
+        if (['pick', 'full'].includes(mode)) {
+          this.currentMode = mode as CaptureMode;
+          vscode.workspace.getConfiguration('pinpoint').update('defaultMode', mode, true);
         }
       } else if (text.startsWith('PINPOINT_TARGET_CHANGED:')) {
         const target = text.replace('PINPOINT_TARGET_CHANGED:', '').trim();
@@ -931,45 +950,66 @@ export class PickerController {
       );
 
       // Inject to focused location (terminal, chat, or clipboard)
-      await this.injectToFocusedLocation(injectedText);
-
-      vscode.window.showInformationMessage(`Captured element #${this.capturedElements.length}`);
+      await this.injectToFocusedLocation(injectedText, this.capturedElements.length);
     } catch (error) {
       vscode.window.showErrorMessage(`Failed to capture element: ${error}`);
     }
   }
 
-  private async injectToFocusedLocation(injectedText: string) {
+  private async injectToFocusedLocation(injectedText: string, elementNumber: number) {
     const target = this.injectionTarget;
 
     if (target === 'claude-code') {
       try {
-        await vscode.env.clipboard.writeText(injectedText);
+        await vscode.env.clipboard.writeText(injectedText + '\n\n');
         await vscode.commands.executeCommand('claude-vscode.focus');
         // Wait for the chat to open and focus (increased delay to handle cold start)
-        await new Promise(r => setTimeout(r, 800));
+        await new Promise(r => setTimeout(r, 600));
         await vscode.commands.executeCommand('editor.action.clipboardPasteAction');
+        
+        // Auxiliary view updates - don't fail the whole block if these error
+        try {
+          await new Promise(r => setTimeout(r, 100));
+          await vscode.commands.executeCommand('list.scrollToBottom');
+          await vscode.commands.executeCommand('cursorBottom');
+        } catch (e) { /* ignore scroll errors */ }
+        
+        vscode.window.showInformationMessage(`Captured element #${elementNumber} to Claude Code`);
         return;
-      } catch {
-        // Claude Code not available, fall through to clipboard
+      } catch (err) {
+        console.warn('Claude Code injection failed, falling back to clipboard', err);
       }
     }
 
     if (target === 'copilot-chat') {
       try {
-        await vscode.commands.executeCommand('workbench.action.chat.open', {
-          query: injectedText,
-          isPartialQuery: true,
-        });
+        await vscode.env.clipboard.writeText(injectedText + '\n\n');
+        await vscode.commands.executeCommand('workbench.action.chat.open');
+        // Wait enough time for the chat view to focus
+        await new Promise(r => setTimeout(r, 600));
+        await vscode.commands.executeCommand('editor.action.clipboardPasteAction');
+        
+        // Auxiliary view updates - don't fail the whole block if these error
+        try {
+          await new Promise(r => setTimeout(r, 100));
+          await vscode.commands.executeCommand('workbench.action.chat.scrollToBottom');
+        } catch (e) { /* might not exist in all versions */ }
+        
+        try {
+          await vscode.commands.executeCommand('list.scrollToBottom'); // Fallback
+          await vscode.commands.executeCommand('cursorBottom'); 
+        } catch (e) { /* ignore scroll errors */ }
+
+        vscode.window.showInformationMessage(`Captured element #${elementNumber} to Copilot Chat`);
         return;
-      } catch {
-        // Copilot Chat not available, fall through to clipboard
+      } catch (err) {
+        console.warn('Copilot Chat injection failed, falling back to clipboard', err);
       }
     }
 
     // Clipboard fallback (or explicit clipboard target)
     await vscode.env.clipboard.writeText(injectedText);
-    vscode.window.showInformationMessage('Context copied to clipboard. Paste where needed.');
+    vscode.window.showInformationMessage(`Context copied to clipboard. Paste where needed.`);
   }
 
   cleanup() {

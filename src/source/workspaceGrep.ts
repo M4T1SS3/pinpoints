@@ -1,6 +1,69 @@
-import * as vscode from 'vscode';
+import * as fs from 'fs';
 import * as path from 'path';
 import { Identity, DomContext, SourceLocation } from '../schemas';
+
+export interface WorkspaceFileProvider {
+  listSourceFiles(): Promise<string[]>;
+  readText(filePath: string): Promise<string>;
+}
+
+export class NodeWorkspaceFileProvider implements WorkspaceFileProvider {
+  private readonly sourceExtensions = new Set(['.tsx', '.jsx', '.vue', '.svelte', '.html', '.ts', '.js']);
+  private readonly ignoredDirectories = new Set([
+    'node_modules',
+    'dist',
+    'build',
+    '.next',
+    '.nuxt',
+    'out',
+    '.git',
+  ]);
+
+  constructor(private readonly workspaceRoot: string) {}
+
+  async listSourceFiles(): Promise<string[]> {
+    if (!this.workspaceRoot || !fs.existsSync(this.workspaceRoot)) {
+      return [];
+    }
+
+    const files: string[] = [];
+    await this.walk(this.workspaceRoot, files);
+    return files;
+  }
+
+  async readText(filePath: string): Promise<string> {
+    return await fs.promises.readFile(filePath, 'utf-8');
+  }
+
+  private async walk(dir: string, outFiles: string[]): Promise<void> {
+    let entries: fs.Dirent[] = [];
+    try {
+      entries = await fs.promises.readdir(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+
+    for (const entry of entries) {
+      const entryPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        if (this.ignoredDirectories.has(entry.name)) {
+          continue;
+        }
+        await this.walk(entryPath, outFiles);
+        continue;
+      }
+
+      if (!entry.isFile()) {
+        continue;
+      }
+
+      const ext = path.extname(entry.name).toLowerCase();
+      if (this.sourceExtensions.has(ext)) {
+        outFiles.push(entryPath);
+      }
+    }
+  }
+}
 
 interface Signal {
   text: string;
@@ -23,14 +86,13 @@ const UTILITY_CLASS_PATTERN = /^(flex|grid|block|inline|hidden|relative|absolute
 const GENERATED_CLASS_PATTERN = /^(sc-|css-|_[a-zA-Z]+_[a-z0-9]{4,}_|[a-zA-Z]+__[a-zA-Z]+-{2}[a-zA-Z0-9]+)/;
 
 export class WorkspaceGrep {
+  constructor(private readonly fileProvider: WorkspaceFileProvider) {}
+
   async search(identity: Identity, dom: DomContext): Promise<SourceLocation | undefined> {
     const signals = this.buildSignals(identity, dom);
     if (signals.length === 0) return undefined;
 
-    const sourceFiles = await vscode.workspace.findFiles(
-      '**/*.{tsx,jsx,vue,svelte,html,ts,js}',
-      '{**/node_modules/**,**/dist/**,**/build/**,**/.next/**,**/.nuxt/**,**/out/**}'
-    );
+    const sourceFiles = await this.fileProvider.listSourceFiles();
 
     if (sourceFiles.length === 0) return undefined;
 
@@ -39,8 +101,8 @@ export class WorkspaceGrep {
     // Search files for signals — limit to first 200 files to avoid slowness
     const filesToSearch = sourceFiles.slice(0, 200);
 
-    for (const fileUri of filesToSearch) {
-      const fileMatches = await this.searchFile(fileUri, signals);
+    for (const filePath of filesToSearch) {
+      const fileMatches = await this.searchFile(filePath, signals);
       if (fileMatches.length > 0) {
         matches.push(...fileMatches);
       }
@@ -97,10 +159,9 @@ export class WorkspaceGrep {
     return false;
   }
 
-  private async searchFile(fileUri: vscode.Uri, signals: Signal[]): Promise<FileMatch[]> {
+  private async searchFile(filePath: string, signals: Signal[]): Promise<FileMatch[]> {
     try {
-      const content = (await vscode.workspace.fs.readFile(fileUri)).toString();
-      const filePath = fileUri.fsPath;
+      const content = await this.fileProvider.readText(filePath);
 
       // Penalize test/story files
       const isTestFile = /\.(test|spec|stories|story)\.[jt]sx?$/.test(filePath);

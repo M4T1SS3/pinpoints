@@ -105,24 +105,41 @@ export class BrowserSessionManager {
   }
 
   async close(): Promise<void> {
-    try {
-      if (this.page) {
-        await this.page.close();
+    if (this.page) {
+      try {
+        if (!this.page.isClosed()) {
+          await this.page.close();
+        }
+      } catch (error) {
+        console.error('Error closing page:', error);
+      } finally {
         this.page = null;
       }
+    }
 
-      if (this.browser) {
-        await this.browser.close();
+    if (this.browser) {
+      try {
+        if (this.browser.connected) {
+          await this.browser.close();
+        }
+      } catch (error) {
+        console.error('Error closing browser:', error);
+      } finally {
         this.browser = null;
       }
+    }
 
-      // Clean up temp directory
-      if (this.tempProfileDir && fs.existsSync(this.tempProfileDir)) {
-        fs.rmSync(this.tempProfileDir, { recursive: true, force: true });
+    // Clean up temp directory
+    if (this.tempProfileDir) {
+      try {
+        if (fs.existsSync(this.tempProfileDir)) {
+          fs.rmSync(this.tempProfileDir, { recursive: true, force: true });
+        }
+      } catch (error) {
+        console.error('Error cleaning browser profile dir:', error);
+      } finally {
         this.tempProfileDir = null;
       }
-    } catch (error) {
-      console.error('Error closing browser session:', error);
     }
   }
 
