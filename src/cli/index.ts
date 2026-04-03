@@ -131,7 +131,15 @@ class PinpointCliRunner {
     page.on('console', (msg) => {
       const text = msg.text();
       if (text.startsWith('PINPOINT_SELECTED:')) {
-        void this.captureClickedElement(page);
+        const dataStr = text.substring('PINPOINT_SELECTED:'.length).trim();
+        let isShiftClick = false;
+        try {
+          const data = JSON.parse(dataStr);
+          isShiftClick = Boolean(data?.shiftKey);
+        } catch (e) {
+          // fallback to false
+        }
+        void this.captureClickedElement(page, isShiftClick);
         return;
       }
 
@@ -147,7 +155,7 @@ class PinpointCliRunner {
     });
   }
 
-  private async captureClickedElement(page: puppeteer.Page): Promise<void> {
+  private async captureClickedElement(page: puppeteer.Page, isShiftClick: boolean = false): Promise<void> {
     try {
       const mode = await page.evaluate(() => {
         return (window as unknown as { pinPointMode?: string }).pinPointMode || 'pick';
@@ -180,14 +188,14 @@ class PinpointCliRunner {
         return;
       }
 
-      await this.captureElement(page, elementHandle);
+      await this.captureElement(page, elementHandle, isShiftClick);
       await elementHandle.dispose();
     } catch (error) {
       console.error('PinPoint: failed to capture clicked element.', error);
     }
   }
 
-  private async captureElement(page: puppeteer.Page, elementHandle: puppeteer.ElementHandle<Element>): Promise<void> {
+  private async captureElement(page: puppeteer.Page, elementHandle: puppeteer.ElementHandle<Element>, isShiftClick: boolean = false): Promise<void> {
     try {
       const selectorExtractor = new SelectorExtractor();
       const domExtractor = new DomExtractor();
@@ -282,20 +290,28 @@ class PinpointCliRunner {
       };
 
       context = redactor.redact(context);
+
+      if (!isShiftClick) {
+        this.capturedElements = [];
+      }
       this.capturedElements.push(context);
 
       const formatter = new ContextFormatter();
       const outputText = formatter.formatForChat(this.capturedElements, this.currentMode, this.workspaceRoot);
-      this.deliverOutput(outputText, this.capturedElements.length);
+      this.deliverOutput(outputText, this.capturedElements.length, isShiftClick);
     } catch (error) {
       console.error('PinPoint: failed to process captured element.', error);
     }
   }
 
-  private deliverOutput(text: string, count: number): void {
+  private deliverOutput(text: string, count: number, isShiftClick: boolean): void {
     const copied = this.copyToClipboard(text);
     if (copied) {
-      console.log(`Captured element #${count} to clipboard.`);
+      if (isShiftClick && count > 1) {
+        console.log(`Appended element #${count} to clipboard (Shift-click).`);
+      } else {
+        console.log(`Captured element #${count} to clipboard.`);
+      }
       return;
     }
 

@@ -752,13 +752,15 @@ export class PickerController {
     page.on('console', (msg: any) => {
       const text = msg.text();
       if (text.startsWith('PINPOINT_SELECTED:')) {
-        const dataStr = text.replace('PINPOINT_SELECTED:', '').trim();
+        const dataStr = text.substring('PINPOINT_SELECTED:'.length).trim();
+        let isShiftClick = false;
         try {
           const data = JSON.parse(dataStr);
-          this.captureClickedElement(page);
+          isShiftClick = Boolean(data?.shiftKey);
         } catch (e) {
-          // Fail silently
+          // fallback to false
         }
+        this.captureClickedElement(page, isShiftClick);
       } else if (text.startsWith('PINPOINT_MODE_CHANGED:')) {
         const mode = text.replace('PINPOINT_MODE_CHANGED:', '').trim();
         if (['pick', 'full'].includes(mode)) {
@@ -775,7 +777,7 @@ export class PickerController {
     });
   }
 
-  private async captureClickedElement(page: any) {
+  private async captureClickedElement(page: any, isShiftClick: boolean = false) {
     try {
       // Get the selected mode from the page
       const mode = await page.evaluate(() => {
@@ -803,7 +805,7 @@ export class PickerController {
           vscode.window.showWarningMessage('PinPoint: Could not identify the clicked element. Please try again.');
           return;
         }
-        await this.captureElement(elementHandle);
+        await this.captureElement(elementHandle, isShiftClick);
       }
     } catch (error) {
       console.error('Failed to capture clicked element:', error);
@@ -830,7 +832,7 @@ export class PickerController {
     }
   }
 
-  async captureElement(elementHandle: any): Promise<void> {
+  async captureElement(elementHandle: any, isShiftClick: boolean = false): Promise<void> {
     try {
       if (!this.browserSession) {
         throw new Error('Browser session not active');
@@ -939,6 +941,9 @@ export class PickerController {
       context = redactor.redact(context);
 
       // Store captured element
+      if (!isShiftClick) {
+        this.capturedElements = [];
+      }
       this.capturedElements.push(context);
 
       // Format and inject to chat

@@ -508,14 +508,12 @@ export async function injectPickerToolbar(
         e.preventDefault();
         e.stopPropagation();
         (window as any).__pinpoint_clicked = el;
-        console.log(
-          'PINPOINT_SELECTED:',
-          JSON.stringify({
-            tag: el.tagName,
-            class: el.className,
-            id: el.id,
-          })
-        );
+        console.log('PINPOINT_SELECTED:' + JSON.stringify({
+          tag: el.tagName,
+          class: el.className,
+          id: el.id,
+          shiftKey: Boolean((e as MouseEvent).shiftKey)
+        }));
       },
       true
     );
