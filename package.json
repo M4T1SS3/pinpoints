@@ -2,7 +2,7 @@
   "name": "pinpoint",
   "displayName": "PinPoint",
   "description": "Click any UI element in your browser to instantly Capture its HTML, styles, and layout context for your AI coding assistant. No more screenshots.",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "publisher": "pinpointpoint",
   "license": "SEE LICENSE IN LICENSE",
   "repository": {
