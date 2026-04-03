@@ -1,12 +1,12 @@
-# PinPoint — The missing link between your UI and your AI
+# PinPoints — The missing link between your UI and your AI
 
-<p align="center"><img src="resources/icon.png" alt="PinPoint — UI Lens" width="160" /></p>
+<p align="center"><img src="resources/icon.png" alt="PinPoints — UI Lens" width="160" /></p>
 
 **Pick UI elements and inject structured context directly into your AI coding agent** — without full-page screenshots.
 
 ## Overview
 
-PinPoint is a VS Code extension that replaces the tedious "screenshot → paste → explain" workflow with instant, structured UI context capture. Hover over elements in a running web app, click to capture, and get AI-optimized context automatically injected into your chat.
+PinPoints is a VS Code extension that replaces the tedious "screenshot → paste → explain" workflow with instant, structured UI context capture. Hover over elements in a running web app, click to capture, and get AI-optimized context automatically injected into your chat.
 
 ### Problem it solves
 
@@ -20,9 +20,9 @@ Extracts stable selectors, cleaned element+parent HTML, layout bbox, and compute
 
 ### 1) VS Code extension
 
-Install PinPoint from the VS Code Marketplace:
+Install PinPoints from the VS Code Marketplace:
 
-https://marketplace.visualstudio.com/items?itemName=pinpointpoint.pinpoint
+https://marketplace.visualstudio.com/items?itemName=pinpointpoint.pinpoints
 
 ### 2) Global CLI installation
 
@@ -35,7 +35,7 @@ npm install -g pinpoints
 Then run:
 
 ```bash
-pinpoint start
+pinpoints start
 ```
 
 
@@ -44,7 +44,7 @@ pinpoint start
 
 ### Quick Start
 
-1. **Start the picker**: Run command `PinPoint: Start Picker`
+1. **Start the picker**: Run command `PinPoints: Start Picker`
 2. **Enter URL**: Type the localhost or external URL to inspect
 3. **Hover & click**: Hover over elements in the browser; click to capture
 4. **Chat opens**: Formatted context is automatically injected
@@ -178,7 +178,7 @@ Computes parent styles, keeps only layout-critical properties:
 Make sure Chrome/Chromium is installed. On Windows, check `Program Files/Google/Chrome`. On macOS, check `/Applications/Google Chrome.app`.
 
 ### Inspector gets stuck
-Press `Escape` to cancel, or run `PinPoint: Stop Picker`.
+Press `Escape` to cancel, or run `PinPoints: Stop Picker`.
 
 ### Screenshots not saving
 Check that `.pinpoint/temp/` is writable. The extension creates it automatically.

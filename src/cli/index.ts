@@ -602,8 +602,8 @@ function parseArgs(argv: string[]): CliOptions {
 }
 
 function printUsage(): void {
-  console.log('PinPoint CLI');
-  console.log('Usage: pinpoint start [--url <url>] [--mode pick|full] [--context-radius <n>] [--screenshot]');
+  console.log('PinPoints CLI');
+  console.log('Usage: pinpoints start [--url <url>] [--mode pick|full] [--context-radius <n>] [--screenshot]');
 }
 
 async function main(): Promise<void> {

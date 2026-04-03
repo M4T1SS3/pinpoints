@@ -1,13 +1,13 @@
 {
-  "name": "pinpoint",
-  "displayName": "PinPoint",
+  "name": "pinpoints",
+  "displayName": "PinPoints",
   "description": "Click any UI element in your browser to instantly Capture its HTML, styles, and layout context for your AI coding assistant. No more screenshots.",
-  "version": "0.1.7",
+  "version": "0.1.4",
   "publisher": "pinpointpoint",
   "license": "SEE LICENSE IN LICENSE",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/M4T1SS3/pinpoint.git"
+    "url": "git+https://github.com/M4T1SS3/pinpoints.git"
   },
   "icon": "resources/icon.png",
   "engines": {
@@ -22,18 +22,12 @@
   ],
   "main": "./out/extension.js",
   "bin": {
-    "pinpoint": "out/cli/index.js"
+    "pinpoints": "out/cli/index.js"
   },
-  "files": [
-    "out/**",
-    "resources/**",
-    "README.md",
-    "LICENSE"
-  ],
   "contributes": {
     "icons": {
       "pinpoint-logo": {
-        "description": "PinPoint Logo",
+        "description": "PinPoints Logo",
         "default": {
           "fontPath": "./resources/fonts/icons.woff",
           "fontCharacter": "\\F101"
@@ -43,23 +37,23 @@
     "commands": [
       {
         "command": "pinpoint.startPicker",
-        "title": "Start PinPoint",
-        "category": "PinPoint",
+        "title": "Start PinPoints",
+        "category": "PinPoints",
         "icon": "$(target)"
       },
       {
         "command": "pinpoint.stopPicker",
-        "title": "PinPoint: Stop Picker",
-        "category": "PinPoint"
+        "title": "PinPoints: Stop Picker",
+        "category": "PinPoints"
       },
       {
         "command": "pinpoint.clearSelection",
-        "title": "PinPoint: Clear Selection",
-        "category": "PinPoint"
+        "title": "PinPoints: Clear Selection",
+        "category": "PinPoints"
       }
     ],
     "configuration": {
-      "title": "PinPoint",
+      "title": "PinPoints",
       "properties": {
         "pinpoint.defaultMode": {
           "type": "string",
