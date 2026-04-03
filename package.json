@@ -2,12 +2,12 @@
   "name": "pinpoints",
   "displayName": "PinPoints",
   "description": "Click any UI element in your browser to instantly Capture its HTML, styles, and layout context for your AI coding assistant. No more screenshots.",
-  "version": "0.1.6",
+  "version": "0.1.3",
   "publisher": "pinpointpoint",
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "Custom",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/M4T1SS3/pinpoints.git"
+    "url": "https://github.com/M4T1SS3/pinpoints"
   },
   "icon": "resources/icon.png",
   "engines": {
@@ -36,18 +36,18 @@
     },
     "commands": [
       {
-        "command": "pinpoint.startPicker",
+        "command": "pinpoints.startPicker",
         "title": "Start PinPoints",
         "category": "PinPoints",
         "icon": "$(target)"
       },
       {
-        "command": "pinpoint.stopPicker",
+        "command": "pinpoints.stopPicker",
         "title": "PinPoints: Stop Picker",
         "category": "PinPoints"
       },
       {
-        "command": "pinpoint.clearSelection",
+        "command": "pinpoints.clearSelection",
         "title": "PinPoints: Clear Selection",
         "category": "PinPoints"
       }
@@ -55,7 +55,7 @@
     "configuration": {
       "title": "PinPoints",
       "properties": {
-        "pinpoint.defaultMode": {
+        "pinpoints.defaultMode": {
           "type": "string",
           "enum": [
             "pick",
@@ -64,19 +64,19 @@
           "default": "pick",
           "description": "Default capture mode"
         },
-        "pinpoint.screenshotEnabled": {
+        "pinpoints.screenshotEnabled": {
           "type": "boolean",
           "default": false,
           "description": "Enable element screenshots by default"
         },
-        "pinpoint.contextRadius": {
+        "pinpoints.contextRadius": {
           "type": "number",
           "default": 1,
           "minimum": 0,
           "maximum": 3,
           "description": "Number of parent levels to include in context"
         },
-        "pinpoint.injectionTarget": {
+        "pinpoints.injectionTarget": {
           "type": "string",
           "enum": [
             "claude-code",
@@ -96,7 +96,7 @@
     "menus": {
       "editor/title": [
         {
-          "command": "pinpoint.startPicker",
+          "command": "pinpoints.startPicker",
           "group": "navigation",
           "when": "editorLangId == typescript || editorLangId == javascript || editorLangId == typescriptreact || editorLangId == javascriptreact || editorLangId == html"
         }

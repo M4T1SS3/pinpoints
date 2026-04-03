@@ -17,7 +17,7 @@ export class StatusBarManager {
 
   private initializeDefaults() {
     this.mainStatus.text = '$(pinpoint-logo) PinPoint';
-    this.mainStatus.command = 'pinpoint.startPicker';
+    this.mainStatus.command = 'pinpoints.startPicker';
     this.mainStatus.tooltip = 'Click to start element picker';
     // Default color (gray/white depending on theme)
     this.mainStatus.color = undefined; 
@@ -34,7 +34,7 @@ export class StatusBarManager {
   update(state: PickerState, text: string) {
     if (state === 'active') {
       this.mainStatus.text = '$(pinpoint-logo) PinPoint Active';
-      this.mainStatus.command = 'pinpoint.stopPicker';
+      this.mainStatus.command = 'pinpoints.stopPicker';
       this.mainStatus.tooltip = 'Click to stop picker (Esc to cancel)';
       // Active color: Bright Green/Amber to match brand
       this.mainStatus.color = '#ABFF06'; 
@@ -46,7 +46,7 @@ export class StatusBarManager {
     } else {
       // Idle state: Grayed out / default color
       this.mainStatus.text = '$(pinpoint-logo) PinPoint';
-      this.mainStatus.command = 'pinpoint.startPicker';
+      this.mainStatus.command = 'pinpoints.startPicker';
       this.mainStatus.tooltip = 'Click to start element picker';
       this.mainStatus.color = new vscode.ThemeColor('statusBar.foreground'); // Use theme foreground (usually gray/white)
       this.mainStatus.backgroundColor = undefined;

@@ -1,7 +1,5 @@
 # PinPoints — The missing link between your UI and your AI
 
-<p align="center"><img src="resources/icon.png" alt="PinPoints — UI Lens" width="160" /></p>
-
 **Pick UI elements and inject structured context directly into your AI coding agent** — without full-page screenshots.
 
 ## Overview

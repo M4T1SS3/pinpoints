@@ -31,7 +31,7 @@ export class PickerController {
   }
 
   private loadSettings() {
-    const config = vscode.workspace.getConfiguration('pinpoint');
+    const config = vscode.workspace.getConfiguration('pinpoints');
     this.currentMode = (config.get('defaultMode') || 'pick') as CaptureMode;
     this.screenshotEnabled = config.get('screenshotEnabled', false) as boolean;
     this.contextRadius = config.get('contextRadius', 1) as number;
@@ -765,13 +765,13 @@ export class PickerController {
         const mode = text.replace('PINPOINT_MODE_CHANGED:', '').trim();
         if (['pick', 'full'].includes(mode)) {
           this.currentMode = mode as CaptureMode;
-          vscode.workspace.getConfiguration('pinpoint').update('defaultMode', mode, true);
+          vscode.workspace.getConfiguration('pinpoints').update('defaultMode', mode, true);
         }
       } else if (text.startsWith('PINPOINT_TARGET_CHANGED:')) {
         const target = text.replace('PINPOINT_TARGET_CHANGED:', '').trim();
         if (['claude-code', 'copilot-chat', 'clipboard'].includes(target)) {
           this.injectionTarget = target;
-          vscode.workspace.getConfiguration('pinpoint').update('injectionTarget', target, true);
+          vscode.workspace.getConfiguration('pinpoints').update('injectionTarget', target, true);
         }
       }
     });

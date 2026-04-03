@@ -14,7 +14,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // Register commands
   const startPickerCmd = vscode.commands.registerCommand(
-    'pinpoint.startPicker',
+    'pinpoints.startPicker',
     async () => {
       if (!pickerController) return;
       try {
@@ -29,7 +29,7 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   const stopPickerCmd = vscode.commands.registerCommand(
-    'pinpoint.stopPicker',
+    'pinpoints.stopPicker',
     async () => {
       if (!pickerController) return;
       try {
@@ -43,7 +43,7 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   const clearSelectionCmd = vscode.commands.registerCommand(
-    'pinpoint.clearSelection',
+    'pinpoints.clearSelection',
     async () => {
       if (!pickerController) return;
       pickerController.clearSelection();
@@ -58,12 +58,12 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   // Show welcome message
-  const hasSeenWelcome = context.globalState.get('pinpoint.seenWelcome');
+  const hasSeenWelcome = context.globalState.get('pinpoints.seenWelcome');
   if (!hasSeenWelcome) {
     vscode.window.showInformationMessage(
       'PinPoint: Hover and click UI elements to capture context for Claude'
     );
-    context.globalState.update('pinpoint.seenWelcome', true);
+    context.globalState.update('pinpoints.seenWelcome', true);
   }
 
   statusBarManager?.show();
