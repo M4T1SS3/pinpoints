@@ -2,12 +2,12 @@
   "name": "pinpoint",
   "displayName": "PinPoint",
   "description": "Click any UI element in your browser to instantly Capture its HTML, styles, and layout context for your AI coding assistant. No more screenshots.",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "publisher": "pinpointpoint",
   "license": "SEE LICENSE IN LICENSE",
   "repository": {
     "type": "git",
-    "url": "https://github.com/M4T1SS3/pinpoint.git"
+    "url": "git+https://github.com/M4T1SS3/pinpoint.git"
   },
   "icon": "resources/icon.png",
   "engines": {
@@ -22,8 +22,14 @@
   ],
   "main": "./out/extension.js",
   "bin": {
-    "pinpoint": "./out/cli/index.js"
+    "pinpoint": "out/cli/index.js"
   },
+  "files": [
+    "out/**",
+    "resources/**",
+    "README.md",
+    "LICENSE"
+  ],
   "contributes": {
     "icons": {
       "pinpoint-logo": {
@@ -107,8 +113,8 @@
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "lint": "tsc -p ./ --noEmit",
+    "test": "npm run compile"
   },
   "devDependencies": {
     "@types/jimp": "^0.2.28",
