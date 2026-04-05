@@ -20,7 +20,7 @@ Extracts stable selectors, cleaned element+parent HTML, layout bbox, and compute
 
 Install PinPoints from the VS Code Marketplace:
 
-https://marketplace.visualstudio.com/items?itemName=pinpointpoint.pinpoints
+[PinPoints on VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=pinpointpoint.pinpoints)
 
 ### 2) Global CLI installation
 
