@@ -66,7 +66,7 @@ export class PickerController {
         const page = await vscode.window.withProgress(
           {
             location: vscode.ProgressLocation.Notification,
-            title: `PinPoint: Loading ${url}...`,
+            title: `PinPoints: Loading ${url}...`,
           },
           async () => {
             const p = await this.browserSession!.launch({ url });
@@ -802,7 +802,7 @@ export class PickerController {
       if (elementHandle) {
         const tagName = await elementHandle.evaluate((el: Element) => el.tagName.toLowerCase());
         if (tagName === 'body' || tagName === 'html') {
-          vscode.window.showWarningMessage('PinPoint: Could not identify the clicked element. Please try again.');
+          vscode.window.showWarningMessage('PinPoints: Could not identify the clicked element. Please try again.');
           return;
         }
         await this.captureElement(elementHandle, isShiftClick);
@@ -884,7 +884,7 @@ export class PickerController {
           visual = await screenshotExtractor.extract(elementHandle, this.tempDir);
         } catch (error) {
           console.warn('Screenshot capture failed:', error);
-          vscode.window.showWarningMessage('PinPoint: Screenshot capture failed. Other data was captured successfully.');
+          vscode.window.showWarningMessage('PinPoints: Screenshot capture failed. Other data was captured successfully.');
         }
       }
 
@@ -966,11 +966,10 @@ export class PickerController {
 
     if (target === 'claude-code') {
       try {
-        await vscode.env.clipboard.writeText(injectedText + '\n\n');
         await vscode.commands.executeCommand('claude-vscode.focus');
         // Wait for the chat to open and focus (increased delay to handle cold start)
         await new Promise(r => setTimeout(r, 600));
-        await vscode.commands.executeCommand('editor.action.clipboardPasteAction');
+        await this.replaceFocusedInputWithText(injectedText + '\n\n');
         
         // Auxiliary view updates - don't fail the whole block if these error
         try {
@@ -988,11 +987,10 @@ export class PickerController {
 
     if (target === 'copilot-chat') {
       try {
-        await vscode.env.clipboard.writeText(injectedText + '\n\n');
         await vscode.commands.executeCommand('workbench.action.chat.open');
         // Wait enough time for the chat view to focus
         await new Promise(r => setTimeout(r, 600));
-        await vscode.commands.executeCommand('editor.action.clipboardPasteAction');
+        await this.replaceFocusedInputWithText(injectedText + '\n\n');
         
         // Auxiliary view updates - don't fail the whole block if these error
         try {
@@ -1015,6 +1013,20 @@ export class PickerController {
     // Clipboard fallback (or explicit clipboard target)
     await vscode.env.clipboard.writeText(injectedText);
     vscode.window.showInformationMessage(`Context copied to clipboard. Paste where needed.`);
+  }
+
+  private async replaceFocusedInputWithText(text: string) {
+    await vscode.env.clipboard.writeText(text);
+
+    // Best-effort clear of the focused input before pasting so latest capture replaces previous one.
+    try {
+      await vscode.commands.executeCommand('editor.action.selectAll');
+      await vscode.commands.executeCommand('deleteLeft');
+    } catch {
+      // Ignore; fallback paste below may still work.
+    }
+
+    await vscode.commands.executeCommand('editor.action.clipboardPasteAction');
   }
 
   cleanup() {

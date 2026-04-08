@@ -11,12 +11,12 @@ export class StatusBarManager {
       vscode.StatusBarAlignment.Right,
       100
     );
-    this.mainStatus.name = 'PinPoint Status';
+    this.mainStatus.name = 'PinPoints Status';
     this.initializeDefaults();
   }
 
   private initializeDefaults() {
-    this.mainStatus.text = '$(pinpoint-logo) PinPoint';
+    this.mainStatus.text = '$(pinpoint-logo) PinPoints';
     this.mainStatus.command = 'pinpoints.startPicker';
     this.mainStatus.tooltip = 'Click to start element picker';
     // Default color (gray/white depending on theme)
@@ -33,19 +33,19 @@ export class StatusBarManager {
 
   update(state: PickerState, text: string) {
     if (state === 'active') {
-      this.mainStatus.text = '$(pinpoint-logo) PinPoint Active';
+      this.mainStatus.text = '$(pinpoint-logo) PinPoints Active';
       this.mainStatus.command = 'pinpoints.stopPicker';
       this.mainStatus.tooltip = 'Click to stop picker (Esc to cancel)';
       // Active color: Bright Green/Amber to match brand
       this.mainStatus.color = '#ABFF06'; 
       this.mainStatus.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
     } else if (state === 'starting') {
-      this.mainStatus.text = '$(loading~spin) PinPoint';
+      this.mainStatus.text = '$(loading~spin) PinPoints';
       this.mainStatus.color = undefined;
       this.mainStatus.backgroundColor = undefined;
     } else {
       // Idle state: Grayed out / default color
-      this.mainStatus.text = '$(pinpoint-logo) PinPoint';
+      this.mainStatus.text = '$(pinpoint-logo) PinPoints';
       this.mainStatus.command = 'pinpoints.startPicker';
       this.mainStatus.tooltip = 'Click to start element picker';
       this.mainStatus.color = new vscode.ThemeColor('statusBar.foreground'); // Use theme foreground (usually gray/white)

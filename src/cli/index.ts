@@ -114,7 +114,7 @@ class PinpointCliRunner {
         await page.waitForSelector('body', { timeout: 2000 }).catch(() => undefined);
         await this.injectPickerUI(page, this.currentMode);
       } catch (error) {
-        console.warn('PinPoint: failed to re-inject toolbar after navigation.', error);
+        console.warn('PinPoints: failed to re-inject toolbar after navigation.', error);
       }
     };
 
@@ -183,7 +183,7 @@ class PinpointCliRunner {
 
       const tagName = await elementHandle.evaluate((el: Element) => el.tagName.toLowerCase());
       if (tagName === 'body' || tagName === 'html') {
-        console.warn('PinPoint: clicked element was too generic (body/html), try again.');
+        console.warn('PinPoints: clicked element was too generic (body/html), try again.');
         await elementHandle.dispose();
         return;
       }
@@ -191,7 +191,7 @@ class PinpointCliRunner {
       await this.captureElement(page, elementHandle, isShiftClick);
       await elementHandle.dispose();
     } catch (error) {
-      console.error('PinPoint: failed to capture clicked element.', error);
+      console.error('PinPoints: failed to capture clicked element.', error);
     }
   }
 
@@ -235,7 +235,7 @@ class PinpointCliRunner {
         try {
           visual = await screenshotExtractor.extract(elementHandle, this.tempDir);
         } catch (error) {
-          console.warn('PinPoint: screenshot capture failed; continuing without image.', error);
+          console.warn('PinPoints: screenshot capture failed; continuing without image.', error);
         }
       }
 
@@ -244,7 +244,7 @@ class PinpointCliRunner {
         const sourceLocator = new SourceLocator();
         sourceLocation = await sourceLocator.locate(page, identity, dom, this.workspaceRoot);
       } catch (error) {
-        console.warn('PinPoint: source detection failed.', error);
+        console.warn('PinPoints: source detection failed.', error);
       }
 
       let reactComponent: string | undefined;
@@ -300,7 +300,7 @@ class PinpointCliRunner {
       const outputText = formatter.formatForChat(this.capturedElements, this.currentMode, this.workspaceRoot);
       this.deliverOutput(outputText, this.capturedElements.length, isShiftClick);
     } catch (error) {
-      console.error('PinPoint: failed to process captured element.', error);
+      console.error('PinPoints: failed to process captured element.', error);
     }
   }
 
@@ -628,6 +628,6 @@ async function main(): Promise<void> {
 }
 
 main().catch((error) => {
-  console.error('PinPoint CLI failed to start.', error);
+  console.error('PinPoints CLI failed to start.', error);
   process.exitCode = 1;
 });

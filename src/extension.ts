@@ -6,7 +6,7 @@ let pickerController: PickerController | undefined;
 let statusBarManager: StatusBarManager | undefined;
 
 export async function activate(context: vscode.ExtensionContext) {
-  console.log('PinPoint extension activated');
+  console.log('PinPoints extension activated');
 
   // Initialize managers
   statusBarManager = new StatusBarManager();
@@ -23,7 +23,7 @@ export async function activate(context: vscode.ExtensionContext) {
         statusBarManager?.update('active', '$(circle-filled~spin) Picker active');
       } catch (error) {
         vscode.window.showErrorMessage(`Failed to start picker: ${error}`);
-        statusBarManager?.update('idle', '$(circle-outline) PinPoint');
+        statusBarManager?.update('idle', '$(circle-outline) PinPoints');
       }
     }
   );
@@ -34,7 +34,7 @@ export async function activate(context: vscode.ExtensionContext) {
       if (!pickerController) return;
       try {
         await pickerController.stopPicker();
-        statusBarManager?.update('idle', '$(circle-outline) PinPoint');
+        statusBarManager?.update('idle', '$(circle-outline) PinPoints');
         vscode.window.showInformationMessage('Picker stopped');
       } catch (error) {
         vscode.window.showErrorMessage(`Failed to stop picker: ${error}`);
@@ -61,7 +61,7 @@ export async function activate(context: vscode.ExtensionContext) {
   const hasSeenWelcome = context.globalState.get('pinpoints.seenWelcome');
   if (!hasSeenWelcome) {
     vscode.window.showInformationMessage(
-      'PinPoint: Hover and click UI elements to capture context for Claude'
+      'PinPoints: Hover and click UI elements to capture context for Claude'
     );
     context.globalState.update('pinpoints.seenWelcome', true);
   }
@@ -70,7 +70,7 @@ export async function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() {
-  console.log('PinPoint extension deactivating');
+  console.log('PinPoints extension deactivating');
   if (pickerController) {
     pickerController.cleanup();
   }
