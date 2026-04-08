@@ -48,6 +48,13 @@ pinpoints start
 4. **Chat opens**: Formatted context is automatically injected
 5. **Add your instruction**: Type "Make this button look like..." and send
 
+### Interaction Toggle
+
+- Press `Esc` to toggle between **Capture** and **Interact** mode.
+- **Capture mode ON**: clicks capture elements.
+- **Capture mode OFF (Interact mode)**: your app behaves normally — you can click/type/use the page, and **nothing is captured**.
+- Press `Esc` again to re-enable capture.
+
 
 
 
@@ -176,7 +183,7 @@ Computes parent styles, keeps only layout-critical properties:
 Make sure Chrome/Chromium is installed. On Windows, check `Program Files/Google/Chrome`. On macOS, check `/Applications/Google Chrome.app`.
 
 ### Inspector gets stuck
-Press `Escape` to cancel, or run `PinPoints: Stop Picker`.
+Press `Escape` to toggle capture OFF, interact normally, then press `Escape` again to resume capture. If needed, run `PinPoints: Stop Picker` to fully close the picker.
 
 ### Screenshots not saving
 Check that `.pinpoint/temp/` is writable. The extension creates it automatically.
