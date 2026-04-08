@@ -62,7 +62,11 @@
             "full"
           ],
           "default": "pick",
-          "description": "Default capture mode"
+          "enumDescriptions": [
+            "Quick context mode",
+            "Screenshot mode"
+          ],
+          "description": "Default capture mode (pick or screenshot)"
         },
         "pinpoints.screenshotEnabled": {
           "type": "boolean",
