@@ -9,3 +9,4 @@ node_modules/
 !.vscode/tasks.json
 .pinpoint/
 .claude/
+scripts/release-local.sh
