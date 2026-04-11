@@ -1,4 +1,4 @@
-# PinPoints — The missing link between your UI and your AI
+# PinPoints: The missing link between your UI and your AI
 
 **Pick UI elements and inject structured context directly into your AI coding agent** — without full-page screenshots.
 
@@ -10,9 +10,6 @@ PinPoints is a VS Code extension that replaces the tedious "screenshot → paste
 
 Avoids noisy screenshots by providing structured, DOM-aware UI context that reduces ambiguity and token usage.
 
-### Solution
-
-Extracts stable selectors, cleaned element+parent HTML, layout bbox, and computed style diffs, optionally captures an element screenshot, and formats everything as AI-friendly Markdown.
 
 ## Installation
 
@@ -40,22 +37,14 @@ pinpoints start
 
 ## Usage
 
-### Quick Start
+### How It Works
 
 1. **Start the picker**: Run command `PinPoints: Start Picker`
 2. **Enter URL**: Type the localhost or external URL to inspect
 3. **Hover & click**: Hover over elements in the browser; click to capture
 4. **Chat opens**: Formatted context is automatically injected
 5. **Add your instruction**: Type "Make this button look like..." and send
-
-### Interaction Toggle
-
-- Press `Esc` to toggle between **Capture** and **Interact** mode.
-- **Capture mode ON**: clicks capture elements.
-- **Capture mode OFF (Interact mode)**: your app behaves normally — you can click/type/use the page, and **nothing is captured**.
-- Press `Esc` again to re-enable capture.
-
-
+6. **Close Toolbar**: Press `Esc` to toggle between **Capture** and **Interact** mode.
 
 
 ## Capture Modes
@@ -175,18 +164,3 @@ Computes parent styles, keeps only layout-critical properties:
 - Overflow, z-index
 
 ---
-
-
-## Troubleshooting
-
-### Chrome not found
-Make sure Chrome/Chromium is installed. On Windows, check `Program Files/Google/Chrome`. On macOS, check `/Applications/Google Chrome.app`.
-
-### Inspector gets stuck
-Press `Escape` to toggle capture OFF, interact normally, then press `Escape` again to resume capture. If needed, run `PinPoints: Stop Picker` to fully close the picker.
-
-### Screenshots not saving
-Check that `.pinpoint/temp/` is writable. The extension creates it automatically.
-
-### Selectors are unstable
-If you see UUIDs or random hashes in captured selectors, that's a sign the app doesn't use stable IDs. The picker falls back to position-based selectors, which may break if the DOM changes.
