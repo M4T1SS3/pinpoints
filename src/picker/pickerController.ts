@@ -54,7 +54,7 @@ export class PickerController {
       this.ensureGitignore();
 
       // Detect local servers and let user pick or enter custom URL
-      const url = await this.promptForUrl();
+      const url = await this.promptForReachableUrl();
       if (!url) {
         return;
       }
@@ -113,13 +113,69 @@ export class PickerController {
           'Picker active: Hover and click elements. Toolbar visible at bottom of page.'
         );
       } catch (innerError) {
-        vscode.window.showErrorMessage(`Error during picker setup: ${innerError}`);
+        const errorText = String(innerError);
+        if (errorText.includes('ERR_CONNECTION_REFUSED')) {
+          vscode.window.showErrorMessage(
+            `Could not reach ${url}. Start your dev server, or run "PinPoints: Start Picker" again and choose a reachable URL.`
+          );
+        } else {
+          vscode.window.showErrorMessage(`Error during picker setup: ${innerError}`);
+        }
         throw innerError;
       }
     } catch (error) {
       vscode.window.showErrorMessage(`Failed to start picker: ${error}`);
       await this.stopPicker();
     }
+  }
+
+  private async promptForReachableUrl(): Promise<string | undefined> {
+    let url = await this.promptForUrl();
+
+    while (url) {
+      const reachable = await this.isLikelyReachableUrl(url);
+      if (reachable) {
+        return url;
+      }
+
+      const choice = await vscode.window.showWarningMessage(
+        `PinPoints can't reach ${url}. Make sure your app is running, then choose another URL.`,
+        'Choose another URL',
+        'Cancel'
+      );
+
+      if (choice !== 'Choose another URL') {
+        return undefined;
+      }
+
+      url = await this.promptForUrl();
+    }
+
+    return undefined;
+  }
+
+  private async isLikelyReachableUrl(url: string): Promise<boolean> {
+    let parsed: URL;
+
+    try {
+      parsed = new URL(url);
+    } catch {
+      return true;
+    }
+
+    const host = parsed.hostname;
+    const isLocalhost = host === 'localhost' || host === '127.0.0.1';
+    if (!isLocalhost) {
+      return true;
+    }
+
+    const defaultPort = parsed.protocol === 'https:' ? 443 : 80;
+    const port = parsed.port ? parseInt(parsed.port, 10) : defaultPort;
+    if (!Number.isFinite(port) || port <= 0) {
+      return true;
+    }
+
+    return this.isPortOpen(port, 250);
   }
 
   private async injectPickerUI(page: any, logoSvg: string, initialMode: string, initialTarget: string) {
